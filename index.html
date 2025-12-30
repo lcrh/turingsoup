@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Turing Soup</title>
+  <link rel="stylesheet" href="css/styles.css?v=40">
+</head>
+<body>
+  <canvas id="soup-canvas" width="64" height="8192"></canvas>
+  <div class="overlay top-left">
+    <span class="gen"><span id="soup-generation">0.00</span> epochs</span>
+  </div>
+  <div class="overlay top-right">
+    <label class="control-label">
+      <span>Speed</span>
+      <input type="range" id="steps-per-frame" min="1" max="1000" value="1" step="1">
+    </label>
+    <label class="control-label">
+      <span>Mutation <span id="mutation-display">0.024%</span></span>
+      <input type="range" id="mutation-rate" min="0" max="100" value="28" step="1">
+    </label>
+  </div>
+  <div class="graphs-container">
+    <div class="graph-panel">
+      <div class="graph-title">Complexity</div>
+      <canvas id="complexity-graph" width="240" height="80"></canvas>
+      <div class="graph-legend">
+        <span class="legend-item-small"><span class="dot white"></span>H</span>
+        <span class="legend-item-small"><span class="dot orange"></span>K</span>
+        <span class="legend-item-small"><span class="dot cyan"></span>H-K</span>
+      </div>
+      <div class="graph-stats">
+        <span class="stat-item"><span class="stat-label">H</span><span class="stat-value" id="shannon-value">0.00</span></span>
+        <span class="stat-item"><span class="stat-label">K</span><span class="stat-value orange" id="kolmogorov-value">0.00</span></span>
+        <span class="stat-item"><span class="stat-label">H-K</span><span class="stat-value cyan" id="complexity-value">0.00</span></span>
+      </div>
+    </div>
+    <div class="graph-panel">
+      <div class="graph-title">Execution</div>
+      <canvas id="exec-graph" width="240" height="80"></canvas>
+      <div class="graph-legend">
+        <span class="legend-item-small"><span class="dot white"></span>steps</span>
+        <span class="legend-item-small"><span class="dot magenta"></span>cycles</span>
+      </div>
+      <div class="graph-stats">
+        <span class="stat-item"><span class="stat-label">steps</span><span class="stat-value" id="steps-value">0</span></span>
+        <span class="stat-item"><span class="stat-label">cycles</span><span class="stat-value magenta" id="exec-value">0</span></span>
+      </div>
+    </div>
+  </div>
+  <div class="legend" id="legend">
+    <div class="legend-title">BFF Instructions</div>
+    <div class="legend-section">
+      <div class="legend-group">
+        <span class="legend-label">Read</span>
+        <div class="legend-items">
+          <div class="legend-item"><span class="swatch" data-instr="<"></span><code>&lt;</code></div>
+          <div class="legend-item"><span class="swatch" data-instr=">"></span><code>&gt;</code></div>
+        </div>
+      </div>
+      <div class="legend-group">
+        <span class="legend-label">Write</span>
+        <div class="legend-items">
+          <div class="legend-item"><span class="swatch" data-instr="{"></span><code>{</code></div>
+          <div class="legend-item"><span class="swatch" data-instr="}"></span><code>}</code></div>
+        </div>
+      </div>
+      <div class="legend-group">
+        <span class="legend-label">Math</span>
+        <div class="legend-items">
+          <div class="legend-item"><span class="swatch" data-instr="+"></span><code>+</code></div>
+          <div class="legend-item"><span class="swatch" data-instr="-"></span><code>-</code></div>
+        </div>
+      </div>
+      <div class="legend-group">
+        <span class="legend-label">Copy</span>
+        <div class="legend-items">
+          <div class="legend-item"><span class="swatch" data-instr="."></span><code>.</code></div>
+          <div class="legend-item"><span class="swatch" data-instr=","></span><code>,</code></div>
+        </div>
+      </div>
+      <div class="legend-group">
+        <span class="legend-label">Loop</span>
+        <div class="legend-items">
+          <div class="legend-item"><span class="swatch" data-instr="["></span><code>[</code></div>
+          <div class="legend-item"><span class="swatch" data-instr="]"></span><code>]</code></div>
+        </div>
+      </div>
+    </div>
+    <div class="legend-title" style="margin-top: 12px;">Data</div>
+    <div class="legend-gradient"></div>
+    <div class="legend-gradient-labels">
+      <span>0</span>
+      <span>255</span>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js?v=50"></script>
+</body>
+</html>

@@ -1,0 +1,332 @@
+/* Turing Soup - Minimal Dark Theme */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: #000;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+}
+
+body {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+#soup-canvas {
+  width: 512px;
+  height: auto;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  cursor: pointer;
+}
+
+.overlay {
+  position: fixed;
+  top: 20px;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0.4;
+  transition: opacity 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.overlay.top-left {
+  left: 20px;
+}
+
+.overlay.top-right {
+  right: 20px;
+  pointer-events: auto;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 12px 16px;
+  border-radius: 8px;
+  backdrop-filter: blur(8px);
+}
+
+body:hover .overlay {
+  opacity: 0.8;
+}
+
+.gen {
+  font-size: 14px;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+
+.control-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.control-label span {
+  font-size: 10px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+input[type="range"] {
+  width: 120px;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #333;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #666;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  background: #888;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: #666;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* Graphs Container */
+.graphs-container {
+  position: fixed;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 10;
+}
+
+body:hover .graphs-container {
+  opacity: 0.9;
+}
+
+.graph-panel {
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px;
+  backdrop-filter: blur(8px);
+}
+
+.graph-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #666;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+#complexity-graph {
+  display: block;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+.graph-legend {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 6px;
+  font-size: 9px;
+  color: #888;
+}
+
+.legend-item-small {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.dot.white { background: rgba(255, 255, 255, 0.6); }
+.dot.orange { background: rgba(255, 160, 0, 0.6); }
+.dot.cyan { background: #0ff; }
+.dot.magenta { background: #f0f; }
+.dot.green { background: #0f0; }
+
+.graph-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.stat-label {
+  font-size: 9px;
+  color: #666;
+}
+
+.stat-value {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.stat-value.cyan {
+  color: #0ff;
+}
+
+.stat-value.orange {
+  color: rgba(255, 160, 0, 0.8);
+}
+
+.stat-value.magenta {
+  color: #f0f;
+}
+
+.graph-steps {
+  font-size: 10px;
+  color: #666;
+}
+
+/* Legend */
+.legend {
+  position: fixed;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: linear-gradient(135deg, rgba(20, 20, 25, 0.95), rgba(10, 10, 15, 0.98));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 16px 20px;
+  color: #ccc;
+  font-size: 11px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+body:hover .legend {
+  opacity: 0.9;
+}
+
+.legend:hover {
+  opacity: 1 !important;
+  pointer-events: auto;
+}
+
+.legend-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #666;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.legend-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.legend-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.legend-label {
+  width: 36px;
+  color: #555;
+  font-size: 10px;
+}
+
+.legend-items {
+  display: flex;
+  gap: 6px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legend-item code {
+  font-family: inherit;
+  color: #888;
+  font-size: 12px;
+}
+
+.swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Instruction colors - bright to stand out */
+.swatch[data-instr="<"] { background: hsl(180, 100%, 70%); }
+.swatch[data-instr=">"] { background: hsl(160, 100%, 75%); }
+.swatch[data-instr="{"] { background: hsl(320, 100%, 75%); }
+.swatch[data-instr="}"] { background: hsl(340, 100%, 80%); }
+.swatch[data-instr="+"] { background: hsl(120, 100%, 70%); }
+.swatch[data-instr="-"] { background: hsl(90, 100%, 75%); }
+.swatch[data-instr="."] { background: hsl(60, 100%, 70%); }
+.swatch[data-instr=","] { background: hsl(45, 100%, 75%); }
+.swatch[data-instr="["] { background: hsl(210, 100%, 75%); }
+.swatch[data-instr="]"] { background: hsl(240, 100%, 80%); }
+
+.legend-gradient {
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(to right, #000 0%, rgb(30, 0, 80) 33%, rgb(180, 20, 120) 66%, rgb(255, 120, 0) 100%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  margin-top: 6px;
+}
+
+.legend-gradient-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 9px;
+  color: #555;
+}
