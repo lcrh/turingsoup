@@ -1,0 +1,18 @@
+# Rust / WASM build artifacts
+wasm/target/
+wasm/pkg/
+wasm/Cargo.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node (if we add npm later)
+node_modules/
