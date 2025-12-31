@@ -516,9 +516,14 @@ initializePopulation().catch(e => {
   console.error('Failed to initialize:', e);
   document.body.innerHTML = `<div style="color: #f66; padding: 40px; font-family: monospace;">
     <h2>Failed to initialize</h2>
-    <p>${e.message}</p>
-    <p style="color: #888; margin-top: 20px;">This may happen if cross-origin isolation is not active.<br>
-    Try a hard refresh (Ctrl+Shift+R) or clear the site data.</p>
+    <p><strong>${e.message}</strong></p>
+    <p style="color: #888; font-size: 12px; margin-top: 10px;">${e.stack || ''}</p>
+    <p style="color: #888; margin-top: 20px;">
+      crossOriginIsolated: ${window.crossOriginIsolated}<br>
+      isSecureContext: ${window.isSecureContext}<br>
+      SharedArrayBuffer: ${typeof SharedArrayBuffer}
+    </p>
+    <p style="color: #666; margin-top: 20px;">Try closing the tab completely and reopening.</p>
   </div>`;
 });
 
