@@ -4,6 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Turing Soup</title>
+  <script>
+    // Force COEP=require-corp (Safari has trouble with credentialless)
+    window.coi = {
+      coepCredentialless: () => false,
+      coepDegrade: () => false,
+    };
+  </script>
   <script src="coi-serviceworker.js"></script>
   <link rel="stylesheet" href="css/styles.css">
 </head>
