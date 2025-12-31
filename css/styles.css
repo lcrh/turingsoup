@@ -502,3 +502,10 @@ a.tooltip-link::after {
   pointer-events: auto;
   cursor: help;
 }
+
+/* Hide legend on small screens to prevent overlap */
+@media (max-width: 900px) {
+  .legend {
+    display: none;
+  }
+}
