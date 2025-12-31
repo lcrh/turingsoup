@@ -1,5 +1,7 @@
 # Turing Soup
 
+**[Live Demo](https://lcrh.github.io/turingsoup/)**
+
 Interactive browser simulation of the "Turing Soup" primordial soup model. Reproduces the phase transition described in the paper as self-replicating programs spontaneously emerge from random initial conditions.
 
 Based on: [Computational Life: How Well-formed, Self-replicating Programs Emerge from Simple Interaction](https://arxiv.org/abs/2406.19108)
