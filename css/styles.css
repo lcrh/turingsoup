@@ -114,6 +114,15 @@ body:hover .overlay {
   color: #fff;
 }
 
+.github-link {
+  color: #555;
+  text-decoration: none;
+}
+
+.github-link:hover {
+  color: #fff;
+}
+
 
 .control-label {
   display: flex;
