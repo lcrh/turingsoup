@@ -47,6 +47,24 @@ body {
   flex-direction: column;
   align-items: flex-start;
   gap: 4px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 10px 14px;
+  border-radius: 8px;
+  backdrop-filter: blur(8px);
+}
+
+.overlay.top-left .title,
+.overlay.top-left .gen {
+  pointer-events: auto;
+  cursor: help;
+}
+
+.overlay.top-left .control-row {
+  pointer-events: auto;
+}
+
+#page-indicator {
+  cursor: help;
 }
 
 .overlay.top-right {
@@ -69,6 +87,8 @@ body:hover .overlay {
   color: #666;
   font-weight: 400;
   letter-spacing: 0.5px;
+  pointer-events: auto;
+  cursor: default;
 }
 
 .gen {
@@ -156,10 +176,12 @@ input[type="range"]::-moz-range-thumb {
   opacity: 0;
   transition: opacity 0.3s;
   z-index: 10;
+  pointer-events: none;
 }
 
 body:hover .graphs-container {
   opacity: 0.9;
+  pointer-events: auto;
 }
 
 .graph-panel {
@@ -168,6 +190,7 @@ body:hover .graphs-container {
   border-radius: 8px;
   padding: 12px;
   backdrop-filter: blur(8px);
+  pointer-events: auto;
 }
 
 .graph-title {
@@ -360,4 +383,119 @@ body:hover .legend {
   margin-top: 4px;
   font-size: 9px;
   color: #555;
+}
+
+/* ===========================================
+   TOOLTIP SYSTEM
+   =========================================== */
+
+.tooltip-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.tooltip {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 12px 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  color: #ccc;
+  font-size: 12px;
+  line-height: 1.6;
+  max-width: 320px;
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.tooltip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tooltip[data-depth="1"] { z-index: 101; }
+.tooltip[data-depth="2"] { z-index: 102; }
+.tooltip[data-depth="3"] { z-index: 103; }
+
+.tooltip-title {
+  font-size: 10px;
+  font-weight: 500;
+  color: #fff;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.tooltip-link {
+  color: #0ff;
+  cursor: pointer;
+  text-decoration: none;
+  border-bottom: 1px dotted rgba(0, 255, 255, 0.4);
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.tooltip-link:hover {
+  color: #fff;
+  border-bottom-color: #0ff;
+}
+
+a.tooltip-link::after {
+  content: ' ↗';
+  font-size: 9px;
+  opacity: 0.5;
+}
+
+.tooltip-muted {
+  color: #666;
+  font-size: 11px;
+}
+
+/* Tooltip triggers */
+.has-tooltip {
+  cursor: help;
+  border-bottom: 1px dotted rgba(255, 255, 255, 0.2);
+}
+
+#epochs-label {
+  pointer-events: auto;
+  cursor: help;
+}
+
+.control-label > span {
+  pointer-events: auto;
+  cursor: help;
+}
+
+.graph-title {
+  pointer-events: auto;
+  cursor: help;
+}
+
+.legend-item-small {
+  pointer-events: auto;
+  cursor: help;
+}
+
+.stat-item {
+  pointer-events: auto;
+  cursor: help;
+}
+
+.legend-group {
+  pointer-events: auto;
+  cursor: help;
+}
+
+.legend-title {
+  pointer-events: auto;
+  cursor: help;
 }

@@ -11,103 +11,103 @@
   <canvas id="soup-canvas" width="64" height="4096"></canvas>
   <div class="overlay top-left">
     <span class="title">turing soup</span>
-    <span class="gen"><span id="soup-generation">0.00</span> epochs <span id="epochs-per-sec">(0 e/s)</span></span>
+    <span class="gen"><span id="soup-generation">0.00</span> <span id="epochs-label">epochs</span> <span id="epochs-per-sec">(0 e/s)</span></span>
     <span class="control-row"><span id="run-state">paused</span> · <span class="control-key" id="toggle-run">space</span></span>
-    <span class="control-row">speed <span id="speed-display">1x</span> · <span class="control-key" id="speed-down">↓</span><span class="control-key" id="speed-up">↑</span></span>
+    <span class="control-row">speed <span id="speed-display">1000x</span> · <span class="control-key" id="speed-down">↓</span><span class="control-key" id="speed-up">↑</span></span>
     <span class="control-row">page <span id="page-indicator"></span> · <span class="control-key" id="page-left">←</span><span class="control-key" id="page-right">→</span></span>
   </div>
   <div class="overlay top-right">
     <label class="control-label">
-      <span>Mutation <span id="mutation-display">0.024%</span></span>
+      <span id="mutation-label">Mutation <span id="mutation-display">0.024%</span></span>
       <input type="range" id="mutation-rate" min="0" max="100" value="28" step="1">
     </label>
     <label class="control-label">
-      <span>Locality <span id="locality-display">any</span></span>
+      <span id="locality-label">Locality <span id="locality-display">any</span></span>
       <input type="range" id="locality-range" min="0" max="5" value="0" step="1">
     </label>
     <label class="control-label">
-      <span>Alignment <span id="alignment-display">64</span></span>
+      <span id="alignment-label">Alignment <span id="alignment-display">64</span></span>
       <input type="range" id="alignment-range" min="0" max="6" value="6" step="1">
     </label>
     <label class="control-label">
-      <span>Tape length <span id="tape-length-display">64</span></span>
+      <span id="tape-length-label">Tape length <span id="tape-length-display">64</span></span>
       <input type="range" id="tape-length-range" min="4" max="8" value="6" step="1">
     </label>
     <label class="control-label">
-      <span>Head1 offset <span id="head1-offset-display">32</span></span>
+      <span id="head1-offset-label">Head1 offset <span id="head1-offset-display">32</span></span>
       <input type="range" id="head1-offset-range" min="0" max="128" value="32" step="1">
     </label>
     <label class="control-label">
-      <span>Max steps <span id="max-steps-display">8192</span></span>
+      <span id="max-steps-label">Max steps <span id="max-steps-display">8192</span></span>
       <input type="range" id="max-steps-range" min="6" max="16" value="13" step="1">
     </label>
   </div>
   <div class="graphs-container">
     <div class="graph-panel">
-      <div class="graph-title">Complexity</div>
+      <div class="graph-title" id="complexity-title">Complexity</div>
       <canvas id="complexity-graph" width="240" height="80"></canvas>
       <div class="graph-legend">
-        <span class="legend-item-small"><span class="dot white"></span>H</span>
-        <span class="legend-item-small"><span class="dot orange"></span>K</span>
-        <span class="legend-item-small"><span class="dot cyan"></span>H-K</span>
+        <span class="legend-item-small" id="legend-h"><span class="dot white"></span>H</span>
+        <span class="legend-item-small" id="legend-k"><span class="dot orange"></span>K</span>
+        <span class="legend-item-small" id="legend-hk"><span class="dot cyan"></span>H-K</span>
       </div>
       <div class="graph-stats">
-        <span class="stat-item"><span class="stat-label">H</span><span class="stat-value" id="shannon-value">0.00</span></span>
-        <span class="stat-item"><span class="stat-label">K</span><span class="stat-value orange" id="kolmogorov-value">0.00</span></span>
-        <span class="stat-item"><span class="stat-label">H-K</span><span class="stat-value cyan" id="complexity-value">0.00</span></span>
+        <span class="stat-item" id="stat-h"><span class="stat-label">H</span><span class="stat-value" id="shannon-value">0.00</span></span>
+        <span class="stat-item" id="stat-k"><span class="stat-label">K</span><span class="stat-value orange" id="kolmogorov-value">0.00</span></span>
+        <span class="stat-item" id="stat-hk"><span class="stat-label">H-K</span><span class="stat-value cyan" id="complexity-value">0.00</span></span>
       </div>
     </div>
     <div class="graph-panel">
-      <div class="graph-title">Execution</div>
+      <div class="graph-title" id="exec-title">Execution</div>
       <canvas id="exec-graph" width="240" height="80"></canvas>
       <div class="graph-legend">
-        <span class="legend-item-small"><span class="dot exec-head0"></span>&lt;&gt;</span>
-        <span class="legend-item-small"><span class="dot exec-head1"></span>{}</span>
-        <span class="legend-item-small"><span class="dot exec-math"></span>+-</span>
-        <span class="legend-item-small"><span class="dot exec-copy"></span>.,</span>
-        <span class="legend-item-small"><span class="dot exec-loop"></span>]</span>
+        <span class="legend-item-small" id="exec-legend-head0"><span class="dot exec-head0"></span>&lt;&gt;</span>
+        <span class="legend-item-small" id="exec-legend-head1"><span class="dot exec-head1"></span>{}</span>
+        <span class="legend-item-small" id="exec-legend-math"><span class="dot exec-math"></span>+-</span>
+        <span class="legend-item-small" id="exec-legend-copy"><span class="dot exec-copy"></span>.,</span>
+        <span class="legend-item-small" id="exec-legend-loop"><span class="dot exec-loop"></span>]</span>
       </div>
       <div class="graph-stats">
-        <span class="stat-item"><span class="stat-label">&lt;&gt;</span><span class="stat-value exec-head0" id="head0-value">0</span></span>
-        <span class="stat-item"><span class="stat-label">{}</span><span class="stat-value exec-head1" id="head1-value">0</span></span>
-        <span class="stat-item"><span class="stat-label">+-</span><span class="stat-value exec-math" id="math-value">0</span></span>
-        <span class="stat-item"><span class="stat-label">.,</span><span class="stat-value exec-copy" id="copy-value">0</span></span>
-        <span class="stat-item"><span class="stat-label">]</span><span class="stat-value exec-loop" id="loop-value">0</span></span>
+        <span class="stat-item" id="exec-stat-head0"><span class="stat-label">&lt;&gt;</span><span class="stat-value exec-head0" id="head0-value">0</span></span>
+        <span class="stat-item" id="exec-stat-head1"><span class="stat-label">{}</span><span class="stat-value exec-head1" id="head1-value">0</span></span>
+        <span class="stat-item" id="exec-stat-math"><span class="stat-label">+-</span><span class="stat-value exec-math" id="math-value">0</span></span>
+        <span class="stat-item" id="exec-stat-copy"><span class="stat-label">.,</span><span class="stat-value exec-copy" id="copy-value">0</span></span>
+        <span class="stat-item" id="exec-stat-loop"><span class="stat-label">]</span><span class="stat-value exec-loop" id="loop-value">0</span></span>
       </div>
     </div>
   </div>
   <div class="legend" id="legend">
-    <div class="legend-title">BFF Instructions</div>
+    <div class="legend-title" id="bff-instructions-title">BFF Instructions</div>
     <div class="legend-section">
-      <div class="legend-group">
+      <div class="legend-group" id="bff-head0">
         <span class="legend-label">head0</span>
         <div class="legend-items">
           <div class="legend-item"><span class="swatch" data-instr="<"></span><code>&lt;</code></div>
           <div class="legend-item"><span class="swatch" data-instr=">"></span><code>&gt;</code></div>
         </div>
       </div>
-      <div class="legend-group">
+      <div class="legend-group" id="bff-head1">
         <span class="legend-label">head1</span>
         <div class="legend-items">
           <div class="legend-item"><span class="swatch" data-instr="{"></span><code>{</code></div>
           <div class="legend-item"><span class="swatch" data-instr="}"></span><code>}</code></div>
         </div>
       </div>
-      <div class="legend-group">
+      <div class="legend-group" id="bff-math">
         <span class="legend-label">math</span>
         <div class="legend-items">
           <div class="legend-item"><span class="swatch" data-instr="+"></span><code>+</code></div>
           <div class="legend-item"><span class="swatch" data-instr="-"></span><code>-</code></div>
         </div>
       </div>
-      <div class="legend-group">
+      <div class="legend-group" id="bff-copy">
         <span class="legend-label">copy</span>
         <div class="legend-items">
           <div class="legend-item"><span class="swatch" data-instr="."></span><code>.</code></div>
           <div class="legend-item"><span class="swatch" data-instr=","></span><code>,</code></div>
         </div>
       </div>
-      <div class="legend-group">
+      <div class="legend-group" id="bff-loop">
         <span class="legend-label">loop</span>
         <div class="legend-items">
           <div class="legend-item"><span class="swatch" data-instr="["></span><code>[</code></div>
@@ -115,7 +115,7 @@
         </div>
       </div>
     </div>
-    <div class="legend-title" style="margin-top: 12px;">Data</div>
+    <div class="legend-title" id="data-legend" style="margin-top: 12px;">Data</div>
     <div class="legend-gradient"></div>
     <div class="legend-gradient-labels">
       <span>0</span>

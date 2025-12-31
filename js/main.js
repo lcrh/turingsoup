@@ -3,6 +3,7 @@
  */
 
 import { PopulationWasm as Population } from './population-wasm.js';
+import { initTooltips, registerTooltip } from './tooltip.js';
 
 const SOUP_WIDTH = 64;
 const SOUP_HEIGHT = 32768;   // 2^15 tapes (2MB soup)
@@ -42,7 +43,7 @@ const maxStepsDisplay = document.getElementById('max-steps-display');
 
 // Speed levels: 1x, 10x, 100x, 1000x
 const SPEED_LEVELS = [1, 10, 100, 1000];
-let speedIndex = 0;
+let speedIndex = 3;  // Default to 1000x
 
 // State
 let population = null;
@@ -499,3 +500,365 @@ document.addEventListener('keydown', async (e) => {
 
 // Initialize
 initializePopulation();
+
+// Initialize tooltip system
+initTooltips();
+setupTooltips();
+
+function setupTooltips() {
+  // Shared tooltip content for BFF operations (used by both BFF legend and execution legend)
+  const opTooltips = {
+    head0: {
+      content: `
+        <div class="tooltip-title"><code>&lt; &gt;</code> Head0 Movement</div>
+        <div><code>&lt;</code> decrements head0 position (moves left)</div>
+        <div><code>&gt;</code> increments head0 position (moves right)</div>
+        <div style="margin-top: 8px; color: #888; font-size: 11px;">
+          Head0 is the primary read head. It determines what byte is read
+          for conditionals and what location is modified by <code>+</code>/<code>-</code> operations.
+          <strong>Initialized at position 0</strong> (start of tape).
+          Wraps around at tape boundaries.
+        </div>
+      `,
+      position: 'left',
+    },
+    head1: {
+      content: `
+        <div class="tooltip-title"><code>{ }</code> Head1 Movement</div>
+        <div><code>{</code> decrements head1 position (moves left)</div>
+        <div><code>}</code> increments head1 position (moves right)</div>
+        <div style="margin-top: 8px; color: #888; font-size: 11px;">
+          Head1 is the secondary write head. It's used as source/destination
+          for copy operations. <strong>Initialized at the configured offset</strong>
+          (default 32). Wraps around at tape boundaries.
+        </div>
+      `,
+      position: 'left',
+    },
+    math: {
+      content: `
+        <div class="tooltip-title"><code>+ -</code> Arithmetic</div>
+        <div><code>+</code> increments byte at head0 (wrapping 255→0)</div>
+        <div><code>-</code> decrements byte at head0 (wrapping 0→255)</div>
+        <div style="margin-top: 8px; color: #888; font-size: 11px;">
+          These operations modify the tape content at the current head0 position.
+          Essential for creating and modifying program code.
+        </div>
+      `,
+      position: 'left',
+    },
+    copy: {
+      content: `
+        <div class="tooltip-title"><code>. ,</code> Copy Operations</div>
+        <div><code>.</code> copies byte from head0 to head1</div>
+        <div><code>,</code> copies byte from head1 to head0</div>
+        <div style="margin-top: 8px; color: #888; font-size: 11px;">
+          Copy operations are key to self-replication. A replicator uses these
+          to duplicate its own code to another location in the soup.
+        </div>
+      `,
+      position: 'left',
+    },
+    loop: {
+      content: `
+        <div class="tooltip-title"><code>[ ]</code> Conditional Loops</div>
+        <div><code>[</code> if byte at head0 is 0, jump to matching <code>]</code></div>
+        <div><code>]</code> if byte at head0 is not 0, jump back to matching <code>[</code></div>
+        <div style="margin-top: 8px; color: #888; font-size: 11px;">
+          Loops enable conditional execution. Unmatched brackets cause the
+          program to halt immediately. The loop counter tracks <code>]</code> executions only.
+        </div>
+      `,
+      position: 'left',
+    },
+  };
+
+  // Title tooltip
+  registerTooltip(document.querySelector('.title'), {
+    content: `
+      <div class="tooltip-title">Turing Soup</div>
+      <div>A 2 MB array of random bytes—a primordial soup where
+      <span class="tooltip-link" data-tooltip="bff">self-replicating programs</span>
+      spontaneously emerge.</div>
+      <div style="margin-top: 10px; color: #888; font-size: 11px;">
+        Each step, two random 64-byte regions are selected, concatenated into a
+        128-byte tape, and executed as a BFF program. The modified tape is then
+        written back, allowing successful replicators to spread through the soup.
+      </div>
+      <div style="margin-top: 10px; color: #fff; font-size: 11px;">
+        ✦ With default settings, replicators typically emerge within ~1000 epochs.
+      </div>
+      <div style="margin-top: 10px;">
+        <a class="tooltip-link" href="https://arxiv.org/abs/2406.19108" target="_blank" rel="noopener">Read the paper</a>
+      </div>
+    `,
+    position: 'bottom',
+    nested: {
+      bff: {
+        content: `
+          <div class="tooltip-title">BFF Programs</div>
+          <div>BFF is a variant of <a class="tooltip-link" href="https://en.wikipedia.org/wiki/Brainfuck" target="_blank" rel="noopener">Brainfuck</a> with two read/write heads
+          operating on a shared tape.</div>
+          <div style="margin-top: 8px; font-family: monospace; font-size: 11px; color: #888;">
+            &lt; &gt; move head0<br>
+            { } move head1<br>
+            + - increment/decrement<br>
+            . , copy between heads<br>
+            [ ] conditional loops
+          </div>
+        `,
+        position: 'right',
+      },
+    },
+  });
+
+  // Epochs tooltip
+  registerTooltip(document.getElementById('epochs-label'), {
+    content: `
+      <div class="tooltip-title">Epochs</div>
+      <div>One epoch = N pair executions, where N is the number of tapes in the soup.</div>
+      <div style="margin-top: 8px; color: #888; font-size: 11px;">
+        Since each pair involves 2 tapes, after one epoch each tape has been
+        selected twice on average. This normalizes progress across different soup sizes.
+      </div>
+    `,
+    position: 'right',
+  });
+
+  // Epochs per second tooltip
+  registerTooltip(document.getElementById('epochs-per-sec'), {
+    content: `
+      <div class="tooltip-title">Simulation Speed</div>
+      <div>Current throughput in epochs per second.</div>
+      <div style="margin-top: 8px; color: #888; font-size: 11px;">
+        Depends on speed setting, hardware, and soup activity.
+        Higher execution counts (after replicators emerge) may slow this down.
+      </div>
+    `,
+    position: 'right',
+  });
+
+  // Page indicator tooltip
+  registerTooltip(document.getElementById('page-indicator'), {
+    content: `
+      <div class="tooltip-title">Soup Pages</div>
+      <div>The soup contains 32,768 tapes (2 MB total), displayed in pages of 4,096 tapes.</div>
+      <div style="margin-top: 8px; color: #888; font-size: 11px;">
+        Use ← → arrow keys or click the controls to navigate between pages.
+        Replicators may emerge on any page.
+      </div>
+    `,
+    position: 'right',
+  });
+
+  // Complexity graph title
+  registerTooltip(document.getElementById('complexity-title'), {
+    content: `
+      <div class="tooltip-title">Complexity Metrics</div>
+      <div>Tracks information-theoretic properties of the soup over time.</div>
+      <div style="margin-top: 8px; color: #888; font-size: 11px;">
+        When replicators emerge, you'll see K (compressibility) drop while
+        H-K (higher-order complexity) rises—indicating structured, non-random patterns.
+      </div>
+    `,
+    position: 'right',
+  });
+
+  // H (Shannon entropy) tooltip
+  const shannonTooltip = {
+    content: `
+      <div class="tooltip-title">H – Shannon Entropy</div>
+      <div>Measures the randomness of byte distribution (0-8 bits).</div>
+      <div style="margin-top: 8px; color: #888; font-size: 11px;">
+        H = 8 means all 256 byte values appear equally (maximum randomness).
+        H &lt; 8 means some bytes appear more often than others.
+        Random initialization starts near 8.
+      </div>
+    `,
+    position: 'right',
+  };
+  registerTooltip(document.getElementById('legend-h'), shannonTooltip);
+  registerTooltip(document.getElementById('stat-h'), shannonTooltip);
+
+  // K (Kolmogorov estimate) tooltip
+  const kolmogorovTooltip = {
+    content: `
+      <div class="tooltip-title">K – Kolmogorov Complexity</div>
+      <div>Estimates algorithmic complexity via compression (bits per byte).</div>
+      <div style="margin-top: 8px; color: #888; font-size: 11px;">
+        Approximated using DEFLATE compression (miniz_oxide library).
+        Lower K means the data is more compressible (has repeating patterns).
+        When replicators emerge, K drops as copies spread through the soup.
+      </div>
+    `,
+    position: 'right',
+  };
+  registerTooltip(document.getElementById('legend-k'), kolmogorovTooltip);
+  registerTooltip(document.getElementById('stat-k'), kolmogorovTooltip);
+
+  // H-K (Higher-order complexity) tooltip
+  const complexityTooltip = {
+    content: `
+      <div class="tooltip-title">H-K – Higher-Order Complexity</div>
+      <div>The difference between entropy and compressibility.</div>
+      <div style="margin-top: 8px; color: #888; font-size: 11px;">
+        H-K ≈ 0 for random data (high H, high K).<br>
+        H-K ≈ 0 for simple repeating patterns (low H, low K).<br>
+        H-K > 0 indicates structured complexity: diverse bytes arranged
+        in compressible patterns—the signature of emergent replicators.
+      </div>
+    `,
+    position: 'right',
+  };
+  registerTooltip(document.getElementById('legend-hk'), complexityTooltip);
+  registerTooltip(document.getElementById('stat-hk'), complexityTooltip);
+
+  // Execution graph title
+  registerTooltip(document.getElementById('exec-title'), {
+    content: `
+      <div class="tooltip-title">Execution Metrics</div>
+      <div>Tracks which BFF operations are being executed (EMA smoothed).</div>
+      <div style="margin-top: 8px; color: #888; font-size: 11px;">
+        Before replicators: mostly flat, low activity.<br>
+        After replicators emerge: copy operations spike as programs
+        actively replicate themselves through the soup.
+      </div>
+    `,
+    position: 'right',
+  });
+
+  // Execution legend items (use 'right' position since they're on the left side of screen)
+  registerTooltip(document.getElementById('exec-legend-head0'), { ...opTooltips.head0, position: 'right' });
+  registerTooltip(document.getElementById('exec-legend-head1'), { ...opTooltips.head1, position: 'right' });
+  registerTooltip(document.getElementById('exec-legend-math'), { ...opTooltips.math, position: 'right' });
+  registerTooltip(document.getElementById('exec-legend-copy'), { ...opTooltips.copy, position: 'right' });
+  registerTooltip(document.getElementById('exec-legend-loop'), { ...opTooltips.loop, position: 'right' });
+
+  // Execution stat items (the numbers below the graph)
+  registerTooltip(document.getElementById('exec-stat-head0'), { ...opTooltips.head0, position: 'right' });
+  registerTooltip(document.getElementById('exec-stat-head1'), { ...opTooltips.head1, position: 'right' });
+  registerTooltip(document.getElementById('exec-stat-math'), { ...opTooltips.math, position: 'right' });
+  registerTooltip(document.getElementById('exec-stat-copy'), { ...opTooltips.copy, position: 'right' });
+  registerTooltip(document.getElementById('exec-stat-loop'), { ...opTooltips.loop, position: 'right' });
+
+  // BFF legend title
+  registerTooltip(document.getElementById('bff-instructions-title'), {
+    content: `
+      <div class="tooltip-title">BFF Instructions</div>
+      <div>BFF is a variant of <a class="tooltip-link" href="https://en.wikipedia.org/wiki/Brainfuck" target="_blank" rel="noopener">Brainfuck</a> with two read/write heads
+      operating on a shared tape.</div>
+      <div style="margin-top: 8px; color: #888; font-size: 11px;">
+        10 instructions: <code>&lt; &gt; { } + - . , [ ]</code><br>
+        All other byte values are no-ops (data).
+      </div>
+    `,
+    position: 'left',
+  });
+
+  // BFF legend items
+  registerTooltip(document.getElementById('bff-head0'), opTooltips.head0);
+  registerTooltip(document.getElementById('bff-head1'), opTooltips.head1);
+  registerTooltip(document.getElementById('bff-math'), opTooltips.math);
+  registerTooltip(document.getElementById('bff-copy'), opTooltips.copy);
+  registerTooltip(document.getElementById('bff-loop'), opTooltips.loop);
+
+  // Slider tooltips
+  registerTooltip(document.getElementById('mutation-label'), {
+    content: `
+      <div class="tooltip-title">Mutation Rate</div>
+      <div>Probability of random byte mutation per position after each execution.</div>
+      <div style="margin-top: 8px; color: #888; font-size: 11px;">
+        Default 0.024% (paper value). Higher rates introduce more variation
+        but can disrupt established replicators. Set to 0 to observe pure
+        selection dynamics.
+      </div>
+    `,
+    position: 'left',
+  });
+
+  registerTooltip(document.getElementById('locality-label'), {
+    content: `
+      <div class="tooltip-title">Locality</div>
+      <div>Maximum distance (in aligned positions) between selected tape pairs.</div>
+      <div style="margin-top: 8px; color: #888; font-size: 11px;">
+        "any" = no restriction (global mixing).<br>
+        Lower values create spatial structure where nearby regions
+        interact more often, enabling local "ecosystems" to form.
+      </div>
+    `,
+    position: 'left',
+  });
+
+  registerTooltip(document.getElementById('alignment-label'), {
+    content: `
+      <div class="tooltip-title">Alignment</div>
+      <div>Byte boundary at which tape selections can start.</div>
+      <div style="margin-top: 8px; color: #888; font-size: 11px;">
+        When alignment equals tape length (default), each tape occupies a distinct,
+        non-overlapping region. Replicators can rely on consistent positioning.
+      </div>
+      <div style="margin-top: 8px; color: #888; font-size: 11px;">
+        When alignment is smaller than tape length, selections may overlap—the same
+        bytes can appear at different offsets across iterations. This selects for
+        replicators that work regardless of where execution begins within their code.
+      </div>
+    `,
+    position: 'left',
+  });
+
+  registerTooltip(document.getElementById('tape-length-label'), {
+    content: `
+      <div class="tooltip-title">Tape Length</div>
+      <div>Size of each selected region in bytes.</div>
+      <div style="margin-top: 8px; color: #888; font-size: 11px;">
+        Two regions of this size are concatenated to form the execution tape.
+        Larger tapes allow more complex programs but take longer to fill
+        with functional code. Default 64 (paper value).
+      </div>
+    `,
+    position: 'left',
+  });
+
+  registerTooltip(document.getElementById('head1-offset-label'), {
+    content: `
+      <div class="tooltip-title">Head1 Offset</div>
+      <div>Initial position of head1 when execution begins.</div>
+      <div style="margin-top: 8px; color: #888; font-size: 11px;">
+        Head0 starts at 0 (beginning of tape). Head1 starts at this offset.
+        Default 32 places head1 at the midpoint of the first region.
+      </div>
+      <div style="margin-top: 8px; color: #fff; font-size: 11px;">
+        ✦ The paper authors note that offset must be &gt;16 for replicators
+        to reliably emerge.
+      </div>
+    `,
+    position: 'left',
+  });
+
+  registerTooltip(document.getElementById('max-steps-label'), {
+    content: `
+      <div class="tooltip-title">Max Steps</div>
+      <div>Maximum BFF instructions executed before halting.</div>
+      <div style="margin-top: 8px; color: #888; font-size: 11px;">
+        Prevents infinite loops. Default 8192 (2^13, paper value).
+        Higher values allow more complex programs to complete but
+        slow down simulation if many programs hit the limit.
+      </div>
+    `,
+    position: 'left',
+  });
+
+  // Data legend tooltip
+  registerTooltip(document.getElementById('data-legend'), {
+    content: `
+      <div class="tooltip-title">Data Bytes</div>
+      <div>All byte values that don't encode BFF instructions are treated as data.</div>
+      <div style="margin-top: 8px; color: #888; font-size: 11px;">
+        Only 10 byte values are instructions: <code>&lt; &gt; { } + - . , [ ]</code><br>
+        The other 246 values (0-255) are no-ops—the instruction pointer simply
+        advances past them. They serve as data storage for programs.
+      </div>
+    `,
+    position: 'left',
+  });
+}
