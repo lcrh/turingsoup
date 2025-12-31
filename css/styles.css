@@ -503,9 +503,15 @@ a.tooltip-link::after {
   cursor: help;
 }
 
-/* Hide legend on small screens to prevent overlap */
+/* Hide legend and graphs on small screens to prevent overlap */
 @media (max-width: 900px) {
   .legend {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .graphs-container {
     display: none;
   }
 }

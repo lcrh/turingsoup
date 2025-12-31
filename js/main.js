@@ -501,9 +501,13 @@ document.addEventListener('keydown', async (e) => {
 // Initialize
 initializePopulation();
 
-// Initialize tooltip system
-initTooltips();
-setupTooltips();
+// Initialize tooltip system (wrapped in try-catch to prevent mobile crashes)
+try {
+  initTooltips();
+  setupTooltips();
+} catch (e) {
+  console.warn('Tooltip initialization failed:', e);
+}
 
 function setupTooltips() {
   // Shared tooltip content for BFF operations (used by both BFF legend and execution legend)
