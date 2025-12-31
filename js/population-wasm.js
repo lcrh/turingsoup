@@ -54,7 +54,7 @@ export class PopulationWasm {
     this.mathEMA = 0;
     this.copyEMA = 0;
     this.loopEMA = 0;
-    this.emaAlpha = 0.05;
+    this.emaAlphaPerPair = 0.00005;  // Per-pair smoothing factor
 
     // Accumulator for consistent graph update rate regardless of speed
     this.execAccumPairs = 0;
@@ -279,12 +279,13 @@ export class PopulationWasm {
     }
     const n = totalCount || 1;
 
-    // Update EMAs
-    this.head0EMA = this.emaAlpha * (totalHead0 / n) + (1 - this.emaAlpha) * this.head0EMA;
-    this.head1EMA = this.emaAlpha * (totalHead1 / n) + (1 - this.emaAlpha) * this.head1EMA;
-    this.mathEMA = this.emaAlpha * (totalMath / n) + (1 - this.emaAlpha) * this.mathEMA;
-    this.copyEMA = this.emaAlpha * (totalCopy / n) + (1 - this.emaAlpha) * this.copyEMA;
-    this.loopEMA = this.emaAlpha * (totalLoop / n) + (1 - this.emaAlpha) * this.loopEMA;
+    // Update EMAs with batch-adjusted alpha for consistent smoothing regardless of speed
+    const alpha = 1 - Math.pow(1 - this.emaAlphaPerPair, totalCount);
+    this.head0EMA = alpha * (totalHead0 / n) + (1 - alpha) * this.head0EMA;
+    this.head1EMA = alpha * (totalHead1 / n) + (1 - alpha) * this.head1EMA;
+    this.mathEMA = alpha * (totalMath / n) + (1 - alpha) * this.mathEMA;
+    this.copyEMA = alpha * (totalCopy / n) + (1 - alpha) * this.copyEMA;
+    this.loopEMA = alpha * (totalLoop / n) + (1 - alpha) * this.loopEMA;
 
     // Accumulate pairs and only push to history at consistent intervals
     this.execAccumPairs += totalCount;
