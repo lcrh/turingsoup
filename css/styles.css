@@ -345,9 +345,12 @@ body:hover .legend {
 }
 
 .legend-item code {
-  font-family: inherit;
+  font-family: monospace;
   color: #888;
   font-size: 12px;
+  width: 12px;
+  text-align: center;
+  display: inline-block;
 }
 
 .swatch {
