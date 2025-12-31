@@ -39,7 +39,7 @@ export class PopulationWasm {
 
     // Selection mode settings
     this.alignment = 64;  // Byte alignment for selection (1, 2, 4, 8, 16, 32, 64)
-    this.localityLimit = null;  // Max slot distance for second tape (null = any)
+    this.localityLimit = null;  // Max slot distance for second tape (null = any, or 1,2,4,8,16 positions)
     this.head1Offset = 32;  // Starting offset for head1 in combined tape
     this.maxSteps = 8192;  // Max execution steps before halting
 
@@ -173,10 +173,10 @@ export class PopulationWasm {
 
     if (this.localityLimit !== null && this.localityLimit > 0) {
       // Limited locality: select within range (in terms of aligned positions)
+      // localityLimit is number of positions (1, 2, 4, 8, or 16)
       const posA = Math.floor(a / this.alignment);
-      const localityInPositions = Math.floor(this.localityLimit * this.numTapes * this.regionSize / this.alignment / 100);
-      const minPos = Math.max(0, posA - localityInPositions);
-      const maxPos = Math.min(numPositions - 1, posA + localityInPositions);
+      const minPos = Math.max(0, posA - this.localityLimit);
+      const maxPos = Math.min(numPositions - 1, posA + this.localityLimit);
       let posB;
       do {
         posB = minPos + Math.floor(Math.random() * (maxPos - minPos + 1));

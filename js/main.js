@@ -364,15 +364,16 @@ function updateMutationRate() {
 
 function updateLocality() {
   const sliderValue = parseInt(localitySlider.value, 10);
+  // 0 = any, 1-5 = powers of 2: 1, 2, 4, 8, 16
+  const locality = sliderValue === 0 ? null : Math.pow(2, sliderValue - 1);
   if (population) {
-    // 100 = no limit (any), 1-99 = percentage of total tapes as max distance
-    population.localityLimit = sliderValue === 100 ? null : Math.floor(population.numTapes * sliderValue / 100);
+    population.localityLimit = locality;
   }
   // Update display
-  if (sliderValue === 100) {
+  if (sliderValue === 0) {
     localityDisplay.textContent = 'any';
   } else {
-    localityDisplay.textContent = `${sliderValue}%`;
+    localityDisplay.textContent = locality.toString();
   }
 }
 
