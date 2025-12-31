@@ -5,6 +5,19 @@
 import { PopulationWasm as Population } from './population-wasm.js';
 import { initTooltips, registerTooltip } from './tooltip.js';
 
+// Wait for cross-origin isolation (service worker may need time on reload)
+if (!window.crossOriginIsolated && window.isSecureContext) {
+  // Service worker might not be ready yet - reload after a short delay
+  const reloadCount = parseInt(sessionStorage.getItem('coiReloadCount') || '0');
+  if (reloadCount < 2) {
+    sessionStorage.setItem('coiReloadCount', String(reloadCount + 1));
+    setTimeout(() => window.location.reload(), 100);
+    throw new Error('Waiting for cross-origin isolation...');
+  }
+  sessionStorage.removeItem('coiReloadCount');
+}
+sessionStorage.removeItem('coiReloadCount');
+
 const SOUP_WIDTH = 64;
 const SOUP_HEIGHT = 32768;   // 2^15 tapes (2MB soup)
 let regionSize = 64;         // 64 bytes per tape (paper default), configurable
