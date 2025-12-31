@@ -499,7 +499,15 @@ document.addEventListener('keydown', async (e) => {
 });
 
 // Initialize
-initializePopulation();
+initializePopulation().catch(e => {
+  console.error('Failed to initialize:', e);
+  document.body.innerHTML = `<div style="color: #f66; padding: 40px; font-family: monospace;">
+    <h2>Failed to initialize</h2>
+    <p>${e.message}</p>
+    <p style="color: #888; margin-top: 20px;">This may happen if cross-origin isolation is not active.<br>
+    Try a hard refresh (Ctrl+Shift+R) or clear the site data.</p>
+  </div>`;
+});
 
 // Initialize tooltip system (wrapped in try-catch to prevent mobile crashes)
 try {

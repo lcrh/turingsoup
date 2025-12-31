@@ -80,6 +80,13 @@ export class PopulationWasm {
   async initialize() {
     const soupSize = this.width * this.height;
 
+    // Check SharedArrayBuffer availability (requires cross-origin isolation)
+    if (typeof SharedArrayBuffer === 'undefined') {
+      console.error('SharedArrayBuffer not available. Cross-origin isolation may not be active.');
+      console.error('crossOriginIsolated:', window.crossOriginIsolated);
+      throw new Error('SharedArrayBuffer required but not available');
+    }
+
     // Create SharedArrayBuffer for soup
     this.soupBuffer = new SharedArrayBuffer(soupSize);
     this.soup = new Uint8Array(this.soupBuffer);
