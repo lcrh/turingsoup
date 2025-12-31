@@ -4,21 +4,41 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Turing Soup</title>
-  <link rel="stylesheet" href="css/styles.css?v=40">
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <canvas id="soup-canvas" width="64" height="8192"></canvas>
+  <canvas id="soup-canvas" width="64" height="4096"></canvas>
   <div class="overlay top-left">
-    <span class="gen"><span id="soup-generation">0.00</span> epochs</span>
+    <span class="title">turing soup</span>
+    <span class="gen"><span id="soup-generation">0.00</span> epochs <span id="epochs-per-sec">(0 e/s)</span></span>
+    <span class="control-row"><span id="run-state">paused</span> · <span class="control-key" id="toggle-run">space</span></span>
+    <span class="control-row">speed <span id="speed-display">1x</span> · <span class="control-key" id="speed-down">↓</span><span class="control-key" id="speed-up">↑</span></span>
+    <span class="control-row">page <span id="page-indicator"></span> · <span class="control-key" id="page-left">←</span><span class="control-key" id="page-right">→</span></span>
   </div>
   <div class="overlay top-right">
     <label class="control-label">
-      <span>Speed</span>
-      <input type="range" id="steps-per-frame" min="1" max="1000" value="1" step="1">
-    </label>
-    <label class="control-label">
       <span>Mutation <span id="mutation-display">0.024%</span></span>
       <input type="range" id="mutation-rate" min="0" max="100" value="28" step="1">
+    </label>
+    <label class="control-label">
+      <span>Locality <span id="locality-display">any</span></span>
+      <input type="range" id="locality-range" min="1" max="100" value="100" step="1">
+    </label>
+    <label class="control-label">
+      <span>Alignment <span id="alignment-display">64</span></span>
+      <input type="range" id="alignment-range" min="0" max="6" value="6" step="1">
+    </label>
+    <label class="control-label">
+      <span>Tape length <span id="tape-length-display">64</span></span>
+      <input type="range" id="tape-length-range" min="4" max="8" value="6" step="1">
+    </label>
+    <label class="control-label">
+      <span>Head1 offset <span id="head1-offset-display">32</span></span>
+      <input type="range" id="head1-offset-range" min="0" max="128" value="32" step="1">
+    </label>
+    <label class="control-label">
+      <span>Max steps <span id="max-steps-display">8192</span></span>
+      <input type="range" id="max-steps-range" min="6" max="16" value="13" step="1">
     </label>
   </div>
   <div class="graphs-container">
@@ -40,12 +60,18 @@
       <div class="graph-title">Execution</div>
       <canvas id="exec-graph" width="240" height="80"></canvas>
       <div class="graph-legend">
-        <span class="legend-item-small"><span class="dot white"></span>steps</span>
-        <span class="legend-item-small"><span class="dot magenta"></span>cycles</span>
+        <span class="legend-item-small"><span class="dot exec-head0"></span>&lt;&gt;</span>
+        <span class="legend-item-small"><span class="dot exec-head1"></span>{}</span>
+        <span class="legend-item-small"><span class="dot exec-math"></span>+-</span>
+        <span class="legend-item-small"><span class="dot exec-copy"></span>.,</span>
+        <span class="legend-item-small"><span class="dot exec-loop"></span>]</span>
       </div>
       <div class="graph-stats">
-        <span class="stat-item"><span class="stat-label">steps</span><span class="stat-value" id="steps-value">0</span></span>
-        <span class="stat-item"><span class="stat-label">cycles</span><span class="stat-value magenta" id="exec-value">0</span></span>
+        <span class="stat-item"><span class="stat-label">&lt;&gt;</span><span class="stat-value exec-head0" id="head0-value">0</span></span>
+        <span class="stat-item"><span class="stat-label">{}</span><span class="stat-value exec-head1" id="head1-value">0</span></span>
+        <span class="stat-item"><span class="stat-label">+-</span><span class="stat-value exec-math" id="math-value">0</span></span>
+        <span class="stat-item"><span class="stat-label">.,</span><span class="stat-value exec-copy" id="copy-value">0</span></span>
+        <span class="stat-item"><span class="stat-label">]</span><span class="stat-value exec-loop" id="loop-value">0</span></span>
       </div>
     </div>
   </div>
@@ -53,35 +79,35 @@
     <div class="legend-title">BFF Instructions</div>
     <div class="legend-section">
       <div class="legend-group">
-        <span class="legend-label">Read</span>
+        <span class="legend-label">head0</span>
         <div class="legend-items">
           <div class="legend-item"><span class="swatch" data-instr="<"></span><code>&lt;</code></div>
           <div class="legend-item"><span class="swatch" data-instr=">"></span><code>&gt;</code></div>
         </div>
       </div>
       <div class="legend-group">
-        <span class="legend-label">Write</span>
+        <span class="legend-label">head1</span>
         <div class="legend-items">
           <div class="legend-item"><span class="swatch" data-instr="{"></span><code>{</code></div>
           <div class="legend-item"><span class="swatch" data-instr="}"></span><code>}</code></div>
         </div>
       </div>
       <div class="legend-group">
-        <span class="legend-label">Math</span>
+        <span class="legend-label">math</span>
         <div class="legend-items">
           <div class="legend-item"><span class="swatch" data-instr="+"></span><code>+</code></div>
           <div class="legend-item"><span class="swatch" data-instr="-"></span><code>-</code></div>
         </div>
       </div>
       <div class="legend-group">
-        <span class="legend-label">Copy</span>
+        <span class="legend-label">copy</span>
         <div class="legend-items">
           <div class="legend-item"><span class="swatch" data-instr="."></span><code>.</code></div>
           <div class="legend-item"><span class="swatch" data-instr=","></span><code>,</code></div>
         </div>
       </div>
       <div class="legend-group">
-        <span class="legend-label">Loop</span>
+        <span class="legend-label">loop</span>
         <div class="legend-items">
           <div class="legend-item"><span class="swatch" data-instr="["></span><code>[</code></div>
           <div class="legend-item"><span class="swatch" data-instr="]"></span><code>]</code></div>
@@ -96,6 +122,6 @@
     </div>
   </div>
 
-  <script type="module" src="js/main.js?v=50"></script>
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>
