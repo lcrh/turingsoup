@@ -5,32 +5,7 @@
 import { PopulationWasm as Population } from './population-wasm.js';
 import { initTooltips, registerTooltip } from './tooltip.js';
 
-// Wait for cross-origin isolation (service worker may need time on reload)
-if (!window.crossOriginIsolated && window.isSecureContext && navigator.serviceWorker) {
-  // Check if service worker is controlling the page
-  if (!navigator.serviceWorker.controller) {
-    // Service worker not controlling yet - wait for it
-    const reloadCount = parseInt(sessionStorage.getItem('coiReloadCount') || '0');
-    if (reloadCount < 3) {
-      sessionStorage.setItem('coiReloadCount', String(reloadCount + 1));
-      // Wait longer on subsequent attempts
-      const delay = 200 * (reloadCount + 1);
-      setTimeout(() => window.location.reload(), delay);
-      throw new Error('Waiting for service worker...');
-    }
-    sessionStorage.removeItem('coiReloadCount');
-  } else {
-    // Service worker is controlling but not isolated - might need hard reload
-    const reloadCount = parseInt(sessionStorage.getItem('coiReloadCount') || '0');
-    if (reloadCount < 2) {
-      sessionStorage.setItem('coiReloadCount', String(reloadCount + 1));
-      // Force reload bypassing cache
-      setTimeout(() => window.location.reload(true), 100);
-      throw new Error('Waiting for cross-origin isolation...');
-    }
-    sessionStorage.removeItem('coiReloadCount');
-  }
-}
+// Clear any stuck reload counter from previous attempts
 sessionStorage.removeItem('coiReloadCount');
 
 const SOUP_WIDTH = 64;
