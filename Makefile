@@ -1,14 +1,12 @@
 .PHONY: build watch serve dev clean test
 
-SHELL := /bin/bash
-
-# Build WASM module
+# Build WASM module (requires: rustup, wasm-pack)
 build:
-	source "$$HOME/.cargo/env" && cd wasm && wasm-pack build --target web --release
+	cd wasm && wasm-pack build --target web --release
 
-# Watch for changes and rebuild (requires cargo-watch: cargo install cargo-watch)
+# Watch for changes and rebuild (requires: cargo-watch)
 watch:
-	source "$$HOME/.cargo/env" && cd wasm && cargo watch -s "wasm-pack build --target web --release"
+	cd wasm && cargo watch -s "wasm-pack build --target web --release"
 
 # Start local dev server with Cross-Origin-Isolation (required for SharedArrayBuffer)
 serve:
@@ -19,9 +17,9 @@ dev: build serve
 
 # Run tests
 test:
-	source "$$HOME/.cargo/env" && cd wasm && cargo test
+	cd wasm && cargo test
 
 # Clean build artifacts
 clean:
-	source "$$HOME/.cargo/env" && cd wasm && cargo clean
+	cd wasm && cargo clean
 	rm -rf wasm/pkg
