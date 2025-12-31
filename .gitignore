@@ -1,7 +1,7 @@
 # Rust / WASM build artifacts
 wasm/target/
-wasm/Cargo.lock
 # Note: wasm/pkg/ is NOT ignored - it contains the built WASM needed at runtime
+# Note: Cargo.lock is committed for reproducible builds
 
 # IDE
 .idea/
