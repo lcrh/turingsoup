@@ -703,7 +703,6 @@ function setupTooltips() {
       <div>The difference between entropy and compressibility.</div>
       <div style="margin-top: 8px; color: #888; font-size: 11px;">
         H-K ≈ 0 for random data (high H, high K).<br>
-        H-K ≈ 0 for simple repeating patterns (low H, low K).<br>
         H-K > 0 indicates structured complexity: diverse bytes arranged
         in compressible patterns—the signature of emergent replicators.
       </div>
