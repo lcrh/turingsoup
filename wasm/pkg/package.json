@@ -3,6 +3,7 @@
   "type": "module",
   "description": "WASM core for Turing Soup BFF simulator",
   "version": "0.1.0",
+  "license": "MIT",
   "files": [
     "turing_soup_wasm_bg.wasm",
     "turing_soup_wasm.js",
